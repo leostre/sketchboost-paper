@@ -115,10 +115,23 @@ if __name__ == '__main__':
     q = Queue(maxsize=args.ngpus)
     for i in range(args.ngpus):
         q.put([i])
-
+    import pickle
     data_info = joblib.load(os.path.join(data_path, 'data_info.pkl'))
-    datasets = ['caltech', 'nuswide', 'mnist', 'mnistreg']
-    strats = ['random', 'proj', ]
+    with open('data/processed/data_info.pkl', 'rb+') as file:
+        data_info = pickle.load(file)
+    print('@@@', data_info.keys())
+    datasets = [
+        # 'otto', 
+                    #  'dionis', 
+                     'helena',
+                       'sf-crime', 
+                       'moa',
+                        #    'delicious', 
+                        #    'mediamill', 
+                           'scm20d', 
+                           'rf1'
+                           ]
+    strats = ['topk']
     ks = [1, 2, 5, 10, 20]
 
     combinations = [(ds, method, k) for (ds, method, k) in product(datasets, strats, ks) if data_info[ds]['nout'] > k

@@ -40,16 +40,16 @@ def run_task(name, gpu, benchmark_path, data_path, dataset, task, fold, trial_na
         script = ""
 
         log = subprocess.check_output(script + ' '.join([
-            sys.executable,
-            RUNNER_PATH,
-            '-b', benchmark_path,
-            '-p', data_path,
+            f'"{sys.executable}"',
+            f'"{RUNNER_PATH}"',
+            '-b', f'"{benchmark_path}"',  # Quote paths with spaces
+            '-p', f'"{data_path}"',
             '-k', dataset,
             '-f', str(fold),
             '-n', str(NTHREADS),
             '-s', str(SEED),
             '-d', ','.join(map(str, gpu)),
-            '-o', output,
+            '-o', f'"{output}"',
             '-r', task
 
         ]), shell=True, stderr=subprocess.STDOUT, executable='/bin/bash').decode()

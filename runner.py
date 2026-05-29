@@ -76,6 +76,91 @@ def evaluate(y_test, test_pred, y_val, val_pred, task, results):
 
     return results
 
+def train_hb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
+    from py_boost.gpu.history_boosting import HistoryBasedBoostingModel
+    # get task
+    if task == 'multiclass':
+        loss = 'crossentropy'
+        metric = 'crossentropy' if 'acc' not in params else 'accuracy'
+
+    elif task == 'multilabel':
+        loss = 'bce'
+        metric = 'bce'
+
+    else:
+        loss = 'mse'
+        metric = 'rmse'
+
+    # get sketch method
+
+    method = params['method']
+    k = params['dim']
+    use_hess = True
+
+    if method == 'raw':
+        proxy = None
+
+    elif method == 'best':
+        proxy = 'topk'
+
+    elif method == 'random':
+        proxy = 'rand'
+
+    elif method == 'proj':
+        proxy = 'proj'
+
+    elif method == 'topk':
+        proxy = 'topk'
+
+    else:
+        raise ValueError('Unknown proxy method')
+
+    # init 
+
+    results = {}
+
+    model = HistoryBasedBoostingModel(loss=loss,
+                        metric=metric,
+                        ntrees=params['ntrees'],
+                        lr=params['lr'],
+                        verbose=100,
+                        smoothing_alpha=0.9,
+                        stabilization_threshold=0.75,
+                        max_bin=256 if 'max_bin' not in params else params['max_bin'],
+                        es=params['es'],
+                        lambda_l2=params['lambda_l2'],
+                        colsample=1,
+                        subsample=params['subsample'],
+                        max_depth=params['max_depth'],
+                        min_data_in_leaf=params['min_data_in_leaf'],
+                        sketch_outputs=k,
+                        sketch_method=proxy,
+                        use_hess=use_hess
+                        )
+    # training
+    t = time()
+    model.fit(X_train, y_train, eval_sets=[{'X': X_val, 'y': y_val}])
+    results['train_time'] = time() - t
+    results['best_iter'] = model.best_round
+
+    # val prediction
+
+    t = time()
+    val_pred = model.predict(X_val)
+    results['val_pred_time'] = time() - t
+
+    # test prediction
+
+    t = time()
+    test_pred = model.predict(X_test)
+    results['test_pred_time'] = time() - t
+
+    # evaluate
+
+    results = evaluate(y_test, test_pred, y_val, val_pred, task, results)
+
+    return results
+
 
 def train_pb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
     # get task
@@ -95,7 +180,7 @@ def train_pb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
 
     method = params['method']
     k = params['dim']
-    use_hess = False if 'use_hess' not in params else params['use_hess']
+    use_hess = True
 
     if method == 'raw':
         proxy = None
@@ -108,6 +193,9 @@ def train_pb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
 
     elif method == 'proj':
         proxy = 'proj'
+
+    elif method == 'topk':
+        proxy = 'topk'
 
     else:
         raise ValueError('Unknown proxy method')
@@ -657,18 +745,18 @@ if __name__ == '__main__':
 
     np.random.seed(args.seed)
 
-    import catboost
-    import xgboost as xgb
-    import gbdtmo
+    # import catboost
+    # import xgboost as xgb
+    # import gbdtmo
 
     from sklearn.model_selection import train_test_split, KFold
     from py_boost import SketchBoost
 
-    import torch
-    from pytorch_tabnet.pretraining import TabNetPretrainer
-    from pytorch_tabnet.tab_model import TabNetClassifier, TabNetRegressor
-    from pytorch_tabnet.multitask import TabNetMultiTaskClassifier
-    from pytorch_tabnet.metrics import Metric
+    # import torch
+    # from pytorch_tabnet.pretraining import TabNetPretrainer
+    # from pytorch_tabnet.tab_model import TabNetClassifier, TabNetRegressor
+    # from pytorch_tabnet.multitask import TabNetMultiTaskClassifier
+    # from pytorch_tabnet.metrics import Metric
     from sklearn.metrics import log_loss
     from time import time
 
@@ -699,22 +787,23 @@ if __name__ == '__main__':
 
         if n != args.fold:
             continue
-
         if args.runner == 'pb':
             results = train_pb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        if args.runner == 'hb':
+            results = train_hb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
 
-        if args.runner == 'cb':
-            results = train_cb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        # if args.runner == 'cb':
+        #     results = train_cb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
 
-        if args.runner == 'xgb':
-            results = train_xgb(X[f0], y[f0], X[f1], y[f1], X_test, y_test,
-                                data_info['task_type'], data_info['nout'], params)
+        # if args.runner == 'xgb':
+        #     results = train_xgb(X[f0], y[f0], X[f1], y[f1], X_test, y_test,
+        #                         data_info['task_type'], data_info['nout'], params)
 
-        if args.runner == 'gbdtmo':
-            results = train_gbdtmo(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'],
-                                   data_info['nout'], params)
+        # if args.runner == 'gbdtmo':
+        #     results = train_gbdtmo(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'],
+        #                            data_info['nout'], params)
 
-        if args.runner == 'tabnet':
-            results = train_tabnet(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        # if args.runner == 'tabnet':
+        #     results = train_tabnet(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
 
     joblib.dump(results, os.path.join(args.output, 'results.pkl'))

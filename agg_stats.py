@@ -83,7 +83,17 @@ def get_stat(fold):
 
 if __name__ == '__main__':
 
-    dataset_order = ['otto', 'dionis', 'helena', 'sf-crime', 'moa', 'moa', 'delicious', 'mediamill', 'scm20d', 'rf1']
+    dataset_order = [
+        # 'otto', 
+                    #  'dionis', 
+                     'helena',
+                    #    'sf-crime', 
+                       'moa',
+                        #    'delicious', 
+                        #    'mediamill', 
+                           'scm20d', 
+                           'rf1'
+                           ]
 
     stat_order = ['train_time', 'best_iter', 'val_pred_time', 'test_pred_time',
                   'test_score', 'val_score', 'test_acc', 'val_acc']
@@ -94,21 +104,21 @@ if __name__ == '__main__':
         os.makedirs(os.path.join('agg', data), exist_ok=True)
         res = {}
 
-        for framework in ['xgb', 'cb']:
+        # for framework in ['xgb', 'cb']:
 
-            fold = os.path.join('runs', 'BASELINES_REFIT', data, framework, 'default')
-            try:
-                sub = get_stat(fold)
-            except FileNotFoundError:
-                continue
-            res[framework] = sub
+        #     fold = os.path.join('runs', 'BASELINES_REFIT', data, framework, 'default')
+        #     try:
+        #         sub = get_stat(fold)
+        #     except FileNotFoundError:
+        #         continue
+        #     res[framework] = sub
 
-        fold = os.path.join('runs', 'SKETCHBOOST_ALLK', data, 'pb', 'raw_10000')
-        sub = get_stat(fold)
-        res['pb'] = sub
+        # fold = os.path.join('runs', 'SKETCHBOOST_ALLK', data, 'pb', 'raw_10000')
+        # sub = get_stat(fold)
+        # res['pb'] = sub
 
-        res = DataFrame(res).T
-        joblib.dump(res, os.path.join('agg', data, 'baselines.pkl'))
+        # res = DataFrame(res).T
+        # joblib.dump(res, os.path.join('agg', data, 'baselines.pkl'))
 
         # strategy no hess
         for strategy in ['best', 'random', 'proj']:
@@ -148,62 +158,62 @@ if __name__ == '__main__':
                 res['best_iter'] = it
                 joblib.dump(res, os.path.join(fpath, 'results.pkl'))
 
-    dataset_order = ['caltech', 'nuswide', 'mnist', 'mnistreg']
+    # dataset_order = ['caltech', 'nuswide', 'mnist', 'mnistreg']
 
-    stat_order = ['train_time', 'best_iter', 'val_pred_time', 'test_pred_time',
-                  'test_score', 'val_score', 'test_acc', 'val_acc']
+    # stat_order = ['train_time', 'best_iter', 'val_pred_time', 'test_pred_time',
+    #               'test_score', 'val_score', 'test_acc', 'val_acc']
 
-    for data in dataset_order:
+    # for data in dataset_order:
 
-        # baselines
-        os.makedirs(os.path.join('agg', data), exist_ok=True)
-        res = {}
-        path = os.path.join('runs', 'GBDTMO_BESTK', data, 'gbdtmo', )
+    #     # baselines
+    #     os.makedirs(os.path.join('agg', data), exist_ok=True)
+    #     res = {}
+    #     path = os.path.join('runs', 'GBDTMO_BESTK', data, 'gbdtmo', )
 
-        for st, g in zip(['raw', 'sparse'], ['gbdtmo', 'gbdtso']):
-            st = [x for x in os.listdir(path) if x.startswith(st)][0]
+    #     for st, g in zip(['raw', 'sparse'], ['gbdtmo', 'gbdtso']):
+    #         st = [x for x in os.listdir(path) if x.startswith(st)][0]
 
-            fold = os.path.join(path, st)
+    #         fold = os.path.join(path, st)
 
-            sub = get_stat(fold)
-            res[g] = sub
+    #         sub = get_stat(fold)
+    #         res[g] = sub
 
-        fold = os.path.join('runs', 'GBDTMO_BESTK', data, 'pb', 'default')
-        sub = get_stat(fold)
-        res['pb'] = sub
+    #     fold = os.path.join('runs', 'GBDTMO_BESTK', data, 'pb', 'default')
+    #     sub = get_stat(fold)
+    #     res['pb'] = sub
 
-        fold = os.path.join('runs', 'GBDTMO_BESTK', data, 'cb', 'default')
-        sub = get_stat(fold)
-        res['cb'] = sub
+    #     fold = os.path.join('runs', 'GBDTMO_BESTK', data, 'cb', 'default')
+    #     sub = get_stat(fold)
+    #     res['cb'] = sub
 
-        res = DataFrame(res).T
-        res['final_test_score'] = res['test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else res[
-            'test_score']
-        res['std_final_test_score'] = res['std_test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else res[
-            'std_test_score']
-        res['multiplier'] = -1 if data in ['yeast', 'mnist', 'caltech'] else 1
-        joblib.dump(res, os.path.join('agg', data, 'baselines.pkl'))
+    #     res = DataFrame(res).T
+    #     res['final_test_score'] = res['test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else res[
+    #         'test_score']
+    #     res['std_final_test_score'] = res['std_test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else res[
+    #         'std_test_score']
+    #     res['multiplier'] = -1 if data in ['yeast', 'mnist', 'caltech'] else 1
+    #     joblib.dump(res, os.path.join('agg', data, 'baselines.pkl'))
 
-        for strategy in ['random', 'proj']:
+    #     for strategy in ['random', 'proj']:
 
-            res = {}
+    #         res = {}
 
-            for attr in stat_order:
-                res[attr] = get_pb_data_result('GBDTMO_BESTK', data, strategy, attr)
-                res['std_' + attr] = get_pb_data_result('GBDTMO_BESTK', data, strategy, attr,
-                                                        lambda x: np.std(x, ddof=1))
+    #         for attr in stat_order:
+    #             res[attr] = get_pb_data_result('GBDTMO_BESTK', data, strategy, attr)
+    #             res['std_' + attr] = get_pb_data_result('GBDTMO_BESTK', data, strategy, attr,
+    #                                                     lambda x: np.std(x, ddof=1))
 
-            res = DataFrame(res)
-            res['final_test_score'] = res['test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else res[
-                'test_score']
-            res['std_final_test_score'] = res['std_test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else \
-                res['std_test_score']
-            res['multiplier'] = -1 if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else 1
+    #         res = DataFrame(res)
+    #         res['final_test_score'] = res['test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else res[
+    #             'test_score']
+    #         res['std_final_test_score'] = res['std_test_acc'] if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else \
+    #             res['std_test_score']
+    #         res['multiplier'] = -1 if data in ['yeast', 'mnist', 'caltech', 'nuswide'] else 1
 
-            # order by rank
-            res['sorter_def'] = res['final_test_score'] * res['multiplier']
-            res['sorter_0'] = res['final_test_score'] * res['multiplier'].rank() + res['train_time'].rank()
-            res['sorter_1'] = min_max_scale(res['final_test_score'] * res['multiplier']) + min_max_scale(
-                res['train_time'])
+    #         # order by rank
+    #         res['sorter_def'] = res['final_test_score'] * res['multiplier']
+    #         res['sorter_0'] = res['final_test_score'] * res['multiplier'].rank() + res['train_time'].rank()
+    #         res['sorter_1'] = min_max_scale(res['final_test_score'] * res['multiplier']) + min_max_scale(
+    #             res['train_time'])
 
-            joblib.dump(res, os.path.join('agg', data, strategy + '.pkl'))
+    #         joblib.dump(res, os.path.join('agg', data, strategy + '.pkl'))

@@ -92,48 +92,48 @@ if __name__ == '__main__':
 
     print(y.max() + 1)
 
-    ### SF-CRIME
+    # ### SF-CRIME
 
-    data_path = os.path.join(processed_data, 'sf-crime')
-    os.makedirs(data_path, exist_ok=True)
-
-
-    def label_encode(col):
-
-        un = col.value_counts().index.values
-        return col.map(Series(np.arange(un.shape[0]), index=un)).values.astype(np.int32)
+    # data_path = os.path.join(processed_data, 'sf-crime')
+    # os.makedirs(data_path, exist_ok=True)
 
 
-    def preprocess_data(data):
+    # def label_encode(col):
 
-        y = label_encode(data['Category'])
-
-        data = data[['Dates', 'PdDistrict', 'Address', 'X', 'Y']].copy()
-
-        for col in ['PdDistrict', 'Address']:
-            data[col] = label_encode(data[col])
-
-        data['Dates'] = pd.to_datetime(data['Dates'])
-
-        data['year'] = data['Dates'].dt.year
-        data['month'] = data['Dates'].dt.month
-        data['day'] = data['Dates'].dt.day
-        data['wd'] = data['Dates'].dt.weekday
-        data['hour'] = data['Dates'].dt.hour
-        data['minute'] = data['Dates'].dt.minute
-
-        X = data.drop('Dates', axis=1).values.astype(np.float32)
-
-        return X, y
+    #     un = col.value_counts().index.values
+    #     return col.map(Series(np.arange(un.shape[0]), index=un)).values.astype(np.int32)
 
 
-    data = pd.read_csv(os.path.join(original_data, 'sf-crime/train.csv.zip'))
-    X, y = preprocess_data(data)
+    # def preprocess_data(data):
 
-    joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
-    joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+    #     y = label_encode(data['Category'])
 
-    print(y.max() + 1)
+    #     data = data[['Dates', 'PdDistrict', 'Address', 'X', 'Y']].copy()
+
+    #     for col in ['PdDistrict', 'Address']:
+    #         data[col] = label_encode(data[col])
+
+    #     data['Dates'] = pd.to_datetime(data['Dates'])
+
+    #     data['year'] = data['Dates'].dt.year
+    #     data['month'] = data['Dates'].dt.month
+    #     data['day'] = data['Dates'].dt.day
+    #     data['wd'] = data['Dates'].dt.weekday
+    #     data['hour'] = data['Dates'].dt.hour
+    #     data['minute'] = data['Dates'].dt.minute
+
+    #     X = data.drop('Dates', axis=1).values.astype(np.float32)
+
+    #     return X, y
+
+
+    # data = pd.read_csv(os.path.join(original_data, 'sf-crime/train.csv.zip'))
+    # X, y = preprocess_data(data)
+
+    # joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
+    # joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+
+    # print(y.max() + 1)
 
     ### HELENA
 
@@ -148,27 +148,27 @@ if __name__ == '__main__':
 
     print(y.max() + 1)
 
-    ### OTTO
+    # ### OTTO
 
-    data_path = os.path.join(processed_data, 'otto')
-    os.makedirs(data_path, exist_ok=True)
-
-
-    def preprocess_data(data):
-
-        X = data.drop(['id', 'target'], axis=1).values.astype(np.float32)
-        y = data['target'].map(lambda x: x[-1]).values.astype(np.int32) - 1
-
-        return X, y
+    # data_path = os.path.join(processed_data, 'otto')
+    # os.makedirs(data_path, exist_ok=True)
 
 
-    data = pd.read_csv(os.path.join(original_data, 'otto/train.csv'))
-    X, y = preprocess_data(data)
+    # def preprocess_data(data):
 
-    joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
-    joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+    #     X = data.drop(['id', 'target'], axis=1).values.astype(np.float32)
+    #     y = data['target'].map(lambda x: x[-1]).values.astype(np.int32) - 1
 
-    print(y.max() + 1)
+    #     return X, y
+
+
+    # data = pd.read_csv(os.path.join(original_data, 'otto/train.csv'))
+    # X, y = preprocess_data(data)
+
+    # joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
+    # joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+
+    # print(y.max() + 1)
 
     ### SCM20D
 
@@ -204,33 +204,33 @@ if __name__ == '__main__':
 
     print(y.shape)
 
-    ### DELICIOUS
+    # ### DELICIOUS
 
-    data_path = os.path.join(processed_data, 'delicious')
-    os.makedirs(data_path, exist_ok=True)
+    # data_path = os.path.join(processed_data, 'delicious')
+    # os.makedirs(data_path, exist_ok=True)
 
-    X, y = get_data('Delicious/Delicious_data.txt')
-    split = get_split('Delicious/delicious_trSplit.txt'), get_split('Delicious/delicious_tstSplit.txt')
+    # X, y = get_data('Delicious/Delicious_data.txt')
+    # split = get_split('Delicious/delicious_trSplit.txt'), get_split('Delicious/delicious_tstSplit.txt')
 
-    joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
-    joblib.dump(y, os.path.join(data_path, 'target.pkl'))
-    joblib.dump(split, os.path.join(data_path, 'split.pkl'))
+    # joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
+    # joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+    # joblib.dump(split, os.path.join(data_path, 'split.pkl'))
 
-    print(y.shape)
+    # print(y.shape)
 
-    ### MEDIAMILL
+    # ### MEDIAMILL
 
-    data_path = os.path.join(processed_data, 'mediamill')
-    os.makedirs(data_path, exist_ok=True)
+    # data_path = os.path.join(processed_data, 'mediamill')
+    # os.makedirs(data_path, exist_ok=True)
 
-    X, y = get_data('Mediamill/Mediamill_data.txt')
-    split = get_split('Mediamill/mediamill_trSplit.txt'), get_split('Mediamill/mediamill_tstSplit.txt')
+    # X, y = get_data('Mediamill/Mediamill_data.txt')
+    # split = get_split('Mediamill/mediamill_trSplit.txt'), get_split('Mediamill/mediamill_tstSplit.txt')
 
-    joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
-    joblib.dump(y, os.path.join(data_path, 'target.pkl'))
-    joblib.dump(split, os.path.join(data_path, 'split.pkl'))
+    # joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
+    # joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+    # joblib.dump(split, os.path.join(data_path, 'split.pkl'))
 
-    print(y.shape)
+    # print(y.shape)
 
     ### SUMMARY
 
@@ -314,37 +314,37 @@ if __name__ == '__main__':
 
     }
 
-    ### GBDTMO datasets
+    # ### GBDTMO datasets
 
-    base_path = 'GBDTMO-EX/dataset'
-    raw_names = ['Caltech101.npz', 'nus-wide.npz', 'mnist.npz', 'mnist.npz', ]
-    process_fns = [loader.Caltech101, loader.nus, loader.mnist_cls, loader.mnist_reg]
-    aliases = ['caltech', 'nuswide', 'mnist', 'mnistreg']
-    tasks = ['multiclass', 'multilabel', 'multiclass', 'multitask']
+    # base_path = 'GBDTMO-EX/dataset'
+    # raw_names = ['Caltech101.npz', 'nus-wide.npz', 'mnist.npz', 'mnist.npz', ]
+    # process_fns = [loader.Caltech101, loader.nus, loader.mnist_cls, loader.mnist_reg]
+    # aliases = ['caltech', 'nuswide', 'mnist', 'mnistreg']
+    # tasks = ['multiclass', 'multilabel', 'multiclass', 'multitask']
 
-    for raw, fn, alias, task in zip(raw_names, process_fns, aliases, tasks):
-        data_path = os.path.join(processed_data, alias)
-        os.makedirs(data_path, exist_ok=True)
+    # for raw, fn, alias, task in zip(raw_names, process_fns, aliases, tasks):
+    #     data_path = os.path.join(processed_data, alias)
+    #     os.makedirs(data_path, exist_ok=True)
 
-        x_train, y_train, x_test, y_test = fn(os.path.join(base_path, raw))
-        split = np.arange(x_train.shape[0]), np.arange(x_test.shape[1]) + x_train.shape[0]
-        X, y = np.concatenate([x_train, x_test], axis=0), np.concatenate([y_train, y_test], axis=0)
+    #     x_train, y_train, x_test, y_test = fn(os.path.join(base_path, raw))
+    #     split = np.arange(x_train.shape[0]), np.arange(x_test.shape[1]) + x_train.shape[0]
+    #     X, y = np.concatenate([x_train, x_test], axis=0), np.concatenate([y_train, y_test], axis=0)
 
-        joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
-        joblib.dump(y, os.path.join(data_path, 'target.pkl'))
-        joblib.dump(split, os.path.join(data_path, 'split.pkl'))
+    #     joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
+    #     joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+    #     joblib.dump(split, os.path.join(data_path, 'split.pkl'))
 
-        data_info[alias] = {
-            'data': os.path.join(alias, 'feats.pkl'),
-            'target': os.path.join(alias, 'target.pkl'),
-            'nout': y.max() + 1 if task == 'multiclass' else y.shape[1],
-            'task_type': task,
+    #     data_info[alias] = {
+    #         'data': os.path.join(alias, 'feats.pkl'),
+    #         'target': os.path.join(alias, 'target.pkl'),
+    #         'nout': y.max() + 1 if task == 'multiclass' else y.shape[1],
+    #         'task_type': task,
 
-            'split': os.path.join(alias, 'split.pkl'),
+    #         'split': os.path.join(alias, 'split.pkl'),
 
-        }
+    #     }
 
-        print(data_info[alias]['nout'])
+    #     print(data_info[alias]['nout'])
 
     ### SAVE SUMMARY
     print(data_info)
