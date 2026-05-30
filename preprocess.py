@@ -150,25 +150,25 @@ if __name__ == '__main__':
 
     # ### OTTO
 
-    # data_path = os.path.join(processed_data, 'otto')
-    # os.makedirs(data_path, exist_ok=True)
+    data_path = os.path.join(processed_data, 'otto')
+    os.makedirs(data_path, exist_ok=True)
 
 
-    # def preprocess_data(data):
+    def preprocess_data(data):
 
-    #     X = data.drop(['id', 'target'], axis=1).values.astype(np.float32)
-    #     y = data['target'].map(lambda x: x[-1]).values.astype(np.int32) - 1
+        X = data.drop(['id', 'target'], axis=1).values.astype(np.float32)
+        y = data['target'].map(lambda x: x[-1]).values.astype(np.int32) - 1
 
-    #     return X, y
+        return X, y
 
 
-    # data = pd.read_csv(os.path.join(original_data, 'otto/train.csv'))
-    # X, y = preprocess_data(data)
+    data = pd.read_csv(os.path.join(original_data, 'otto/train.csv'))
+    X, y = preprocess_data(data)
 
-    # joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
-    # joblib.dump(y, os.path.join(data_path, 'target.pkl'))
+    joblib.dump(X, os.path.join(data_path, 'feats.pkl'))
+    joblib.dump(y, os.path.join(data_path, 'target.pkl'))
 
-    # print(y.max() + 1)
+    print(y.max() + 1)
 
     ### SCM20D
 

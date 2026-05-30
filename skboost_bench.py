@@ -58,23 +58,25 @@ if __name__ == '__main__':
     datasets = [
         # 'otto', 
                     #  'dionis', 
-                     'helena',
+                    #  'helena',
                     #    'sf-crime', 
                        'moa',
                         #    'delicious', 
                         #    'mediamill', 
                         #    'scm20d', 
-                           'rf1'
+                        #    'rf1'
                            ]
 
     strats = ['topk',
             #    'random', 'proj', 
                ]
     ks = [
-        1,
+        # 1,
         #   2, 
         # 5, 
-        10, 20]
+        10,
+          20
+        ]
 
     combinations = [(ds, method, k) for (ds, method, k) in product(datasets, strats, ks) if data_info[ds]['nout'] > k
                     ] #+ [(ds, 'raw', 10000) for ds in datasets]

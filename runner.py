@@ -76,7 +76,7 @@ def evaluate(y_test, test_pred, y_val, val_pred, task, results):
 
     return results
 
-def train_hb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
+def train_hb(X_train, y_train, X_val, y_val, X_test, y_test, task, params, stabilization_threshold=0.75):
     from py_boost.gpu.history_boosting import HistoryBasedBoostingModel
     # get task
     if task == 'multiclass':
@@ -125,7 +125,7 @@ def train_hb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
                         lr=params['lr'],
                         verbose=100,
                         smoothing_alpha=0.9,
-                        stabilization_threshold=0.75,
+                        stabilization_threshold=stabilization_threshold,
                         max_bin=256 if 'max_bin' not in params else params['max_bin'],
                         es=params['es'],
                         lambda_l2=params['lambda_l2'],
@@ -161,6 +161,14 @@ def train_hb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
 
     return results
 
+from functools import partial
+train_hb025 = partial(train_hb, stabilization_threshold=.25)
+train_hb050 =  partial(train_hb, stabilization_threshold=.5)
+train_hb075 =  partial(train_hb, stabilization_threshold=.75)
+train_hb10 = partial(train_hb, stabilization_threshold=1.0)
+train_hb15 = partial(train_hb, stabilization_threshold=1.5)
+train_hb20 = partial(train_hb, stabilization_threshold=2.0)
+train_hb20 = partial(train_hb, stabilization_threshold=3.0)
 
 def train_pb(X_train, y_train, X_val, y_val, X_test, y_test, task, params):
     # get task
@@ -789,8 +797,13 @@ if __name__ == '__main__':
             continue
         if args.runner == 'pb':
             results = train_pb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
-        if args.runner == 'hb':
-            results = train_hb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        if 'hb' in args.runner:
+            results = locals()[f'train_{args.runner}'](X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        #     results = train_hb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        # if args.runner == 'hb15':
+        #     results = train_hb15(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
+        # if args.runner == 'hb10':
+        #     results = train_hb10(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)
 
         # if args.runner == 'cb':
         #     results = train_cb(X[f0], y[f0], X[f1], y[f1], X_test, y_test, data_info['task_type'], params)

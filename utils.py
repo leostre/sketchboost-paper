@@ -33,7 +33,7 @@ def run_task(name, gpu, benchmark_path, data_path, dataset, task, fold, trial_na
         os.remove(os.path.join(output, f))
 
     joblib.dump(params, os.path.join(output, 'params.pkl'))
-
+    results = {}
     # TRAIN
     try:
 
@@ -62,6 +62,7 @@ def run_task(name, gpu, benchmark_path, data_path, dataset, task, fold, trial_na
 
         with open(os.path.join(output, 'train_log.txt'), 'w') as f:
             f.write(log)
+        results = joblib.load(os.path.join(output, 'results.pkl'))
 
     except subprocess.CalledProcessError as e:
 
@@ -80,7 +81,7 @@ def run_task(name, gpu, benchmark_path, data_path, dataset, task, fold, trial_na
 
         print('HARD TIMEOUT!')
 
-    results = joblib.load(os.path.join(output, 'results.pkl'))
+
     return results
 
 
